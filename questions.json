@@ -1,0 +1,88 @@
+{"questions": [
+        {"tag": "start_conversation",
+         "patterns": ["Hi there", "Is anyone there?","Hey","Hola", "Hello", "Good day","Hi"],
+         "responses": ["Hello, nice to meet you", "Happy to have you here", "Good to see you again", "Hi there, how can I help?"],
+         "context": [""]
+        },
+        {"tag": "what_are_you",
+         "patterns": ["What is your name?", "what are you?", "who are you?","your name pls?"],
+         "responses": ["Hi, I'm  your CounselBot", "I'm CounselBot ", "Call me CounselBot"],
+         "context": [""]
+        },
+        {"tag": "end_conversation",
+         "patterns": ["Bye", "See you later", "Goodbye", "Nice chatting to you, bye", "Till next time"],
+         "responses": ["Have a lovely time!", "Have a wonderful day", "Suite yourself","Have fun!"],
+         "context": [""]
+        },
+        {"tag": "thanks",
+         "patterns": ["Thanks", "Thank you", "That's helpful", "Awesome, thanks", "Thanks for helping me"],
+         "responses": ["Happy to help!", "Any time!", "My pleasure","Do enjoy the game","Have fun on tennis court"],
+         "context": [""]
+        },
+        {"tag": "confused",
+         "patterns": [],
+         "responses": ["Sorry, kindly rephrase the question","Sorry, can't understand you", "Please give me more information", "Not sure I understand"],
+         "context": [""]
+        },
+        {"tag": "options",
+         "patterns": ["How can you help me?", "What can you do?", "What help you provide?", "How can you be helpful?", "What support do you offered","What do you know?","what help?","What are you about?"],
+         "responses": ["I can guide you through how to get started with your career"],
+         "context": [""]
+        },
+        {"tag": "bot_scope",
+         "patterns": ["What are the job oppurtunities after school?", "tell me about the various career choices?", "Do you really know a lot about career choices?", "what exactly do you know about choosing the right career?","what do you mean by guides through career selection process?"],
+         "responses": ["I know quiet some things about career selection, choices, scope and many more","I know some of the most selected fields like science and humanities, engineering and performing arts to mention a few","Ask me a question about career choices and I will answer to the best of my knowledge"],
+         "context": [""]
+        },
+        {"tag": "top_choices",
+         "patterns": ["Who are the top choices of every student?", "List the top choices of every student", "Top career choices?", "What are the most commonly chosen career paths?", "The most common career paths are?", "Do you know the top career paths?"],
+         "responses": ["As of January 2020, the top career paths are Science, Maths, Engineering, Life science, Business, Accounting, Law and performing arts"],
+         "context": [""]
+        },
+        {"tag": "Science",
+         "patterns": ["What are the general sub streams in science?", "List the sub streams in science", "Do you know general sub streams in science?", "What are the sub streams in science?", "science sub streams ?" ],
+         "responses": ["The general sub streams in science are biology, physics, chemistry, computer science, biochemistry, biophysics, agriculture, environmental science, hospitality, animation and many more."],
+         "context": [""]
+        },
+        {"tag": "arts",
+         "patterns": ["What are the general sub streams in arts?", "List the sub streams in arts", "Do you know general sub streams in arts?", "What are the sub streams in arts?", "arts sub streams ?"],
+         "responses": ["The general sub streams in arts are visual communication, journalism, interior design, english literature, psychology, sociology, foreign languages and many more."],
+         "context": [""]
+        },
+        {"tag": "commerce",
+         "patterns": ["What are the general sub streams in commerce?", "List the sub streams in commerce", "Do you know general sub streams in commerce?", "What are the sub streams in commerce?", "commerce sub streams ?"],
+         "responses": ["The general sub streams in commerce are accounting, economics, finance, information science, human resource, management, tourism and many more."],
+         "context": [""]
+        },
+        {"tag": "civil",
+         "patterns": ["What are the job oppurtunities in civil services?", "List the jobs in civil services", "Do you know the job oppurtunities in civil services?", "What are the jobs in civil services?", "civil services jobs?" ],
+         "responses": ["The job oppurtunities in civil services are IAS, IPS, IFS, audit and accounting, postal service, armed forces section officer, corporate law service and many more."],
+         "context": [""]
+        },
+        {"tag": "engineering",
+         "patterns": ["What are the branches in engineering?", "List the branches in engineering", "Do you know the branches in engineering?", "What do you know about the branches in engineering?", "engineering branches?" ],
+         "responses": ["The branches in engineering are computer science, biotechnology, electronics and communication, chemical, civil, aerospace, electric and electronics, bioinformatics and many more."],
+         "context": [""]
+        },
+        {"tag": "results",
+         "patterns": ["What will my results look like?", "How will my results be?", "when will I get my results?", "Give details about my results" ],
+         "responses": ["Your results will be displayed in a detailed manner once you take the test. It will have a list of all the possible career choices you have an aptitude for, branches and job oppurtunities in the same."],
+         "context": [""]
+        },
+        {"tag": "choice",
+         "patterns": ["what will happen if I make the wrong choice?","When do you know if you've made a wrong choice?","When is it too late to realise you made the wrong choice?","How do you decide when you have two conflicting choices?","tell me how to rectify a wrong choice"],
+         "responses": ["It's never too late to change your career if you do not see yourself thriving in that field. Taking our career guidance test would help you streamline your choices and make the right decision."],
+         "context": [""]
+        },
+        {"tag": "guidance",
+         "patterns": ["Can I get further guidance after my results?", "Can I talk to an expert for guidance?", "How to get more insight?", "More guidance required", "Insight required."],
+         "responses": ["The results will be followed by contacts of a few experts in the field of psychology. You can contact them for further support."],
+         "context": [""]
+        },
+        {"tag": "format",
+         "patterns": ["What's the test format?","Do we just keep answering till we get tired?","How many questions are there in the test?","When do we attend the test?","How many tests can be taken?"],
+         "responses": ["The test comprises of forty multiple choice questions which include questions based on general aptitude, analytical and logical reasoning, area of interest and personality."],
+         "context": [""]
+        }
+   ]
+}
