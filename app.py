@@ -1,13 +1,18 @@
 import numpy as np
 import pandas as pd
-import preprocessor as p
+#import preprocessor as p
+import counselor
 from tensorflow.keras.models import load_model
 import joblib
 from pathlib import Path
-import matplotlib.pyplot as plt
 from PIL import Image
 import streamlit as st
 import imagify
+from bokeh.plotting import figure, output_file, show
+import math
+from bokeh.palettes import Greens
+from bokeh.transform import cumsum
+from bokeh.models import LabelSet, ColumnDataSource
 #ap = Path.joinpath(Path.cwd(), 'models')
 #dsp = Path.joinpath(Path.cwd(), 'dataset')
 
@@ -288,52 +293,62 @@ def main():
                                                                 c = subjects[n]
                                                                 out.append(c)
 
-                                                            explode = (0.0, 0.05, 0.1, 0.15, 0.3)
+                                                            output_file("pie.html")
 
-                                                            colors = ("orange", "cyan", "brown", "indigo", "beige")
+                                                            graph = figure(title="Recommended subjects", height=500,
+                                                                           width=500)
+                                                            radians = [math.radians((percent / 100) * 360) for percent
+                                                                       in data]
 
-                                                            wp = {'linewidth': 0.5, 'edgecolor': "green"}
+                                                            start_angle = [math.radians(0)]
+                                                            prev = start_angle[0]
+                                                            for i in radians[:-1]:
+                                                                start_angle.append(i + prev)
+                                                                prev = i + prev
 
-                                                            def func(pct, allvalues):
-                                                                absolute = int(pct / 100. * np.sum(allvalues))
-                                                                return "{:.1f}%\n({:d} g)".format(pct, absolute)
+                                                            end_angle = start_angle[1:] + [math.radians(0)]
 
-                                                            st.header("Recommended subjects:")
-                                                            fig, ax = plt.subplots(figsize=(10, 7))
-                                                            wedges, texts, autotexts = ax.pie(data,
-                                                                                              autopct=lambda pct: func(
-                                                                                                  pct, data),
-                                                                                              explode=explode,
-                                                                                              labels=out,
-                                                                                              shadow=True,
-                                                                                              colors=colors,
-                                                                                              wedgeprops=wp,
-                                                                                              textprops=dict(
-                                                                                                  color="magenta"))
-                                                            ax.legend(wedges, out,
-                                                                      title="Subjects",
-                                                                      loc="center left",
-                                                                      bbox_to_anchor=(1, 0, 0.5, 1))
+                                                            x = 0
+                                                            y = 0
 
-                                                            ax.set_title("")
+                                                            radius = 0.8
 
-                                                            st.pyplot(fig)
+                                                            color = Greens[len(out)]
+                                                            graph.xgrid.visible = False
+                                                            graph.ygrid.visible = False
+                                                            graph.xaxis.visible = False
+                                                            graph.yaxis.visible = False
+
+                                                            for i in range(len(out)):
+                                                                graph.wedge(x, y, radius,
+                                                                            start_angle=start_angle[i],
+                                                                            end_angle=end_angle[i],
+                                                                            color=color[i],
+                                                                            legend_label=out[i] + "-" + str(
+                                                                                round(data[i])) + "%")
+
+                                                            graph.add_layout(graph.legend[0], 'right')
+                                                            st.bokeh_chart(graph, use_container_width=True)
+                                                            labels = LabelSet(x='text_pos_x', y='text_pos_y',
+                                                                                text='percentage', level='glyph',
+                                                                                angle=0, render_mode='canvas')
+                                                            graph.add_layout(labels)
 
                                                             st.header('More information on the subjects')
                                                             # We'll be using a csv file for that
                                                             for i in range(0, 5):
-                                                                st.write(subjects[int(l[i])])
+                                                                st.subheader(subjects[int(l[i])])
                                                                 st.write(df['about'][int(l[i]) - 1])
 
                                                             st.header('Choice of Degrees')
                                                             # We'll be using a csv file for that
                                                             for i in range(0, 5):
-                                                                st.write(subjects[int(l[i])])
+                                                                st.subheader(subjects[int(l[i])])
                                                                 st.write(df['further career'][int(l[i]) - 1])
 
                                                             st.header('Trends over the years')
                                                             # We'll be using a csv file for that
-                                                            fig, ax = plt.subplots()
+                                                           
 
                                                             def Convert(string):
                                                                 li = list(string.split(","))
@@ -345,15 +360,33 @@ def main():
                                                             for i in range(0, 5):
                                                                 t = Convert(df['trends'][int(l[i]) - 1])
                                                                 y.append(t)
-                                                            plt.plot(x, (y[0]), 'pink')
-                                                            plt.plot(x, y[1], 'g')
-                                                            plt.plot(x, y[2], 'blue')
-                                                            plt.plot(x, y[3], 'y')
-                                                            plt.plot(x, y[4], 'r')
-                                                            plt.xlabel('Years')
-                                                            plt.ylabel('People')
-                                                            plt.title('Trends over the years')
-                                                            st.pyplot(fig)
+                                                            output_file("line.html")
+                                                            graph2 = figure(title="Trends")
+
+                                                            graph2.line(x, y[0], line_color="Purple",
+                                                                        legend_label=out[0])
+                                                            graph2.line(x, y[1], line_color="Blue",
+                                                                        legend_label=out[1])
+                                                            graph2.line(x, y[2], line_color="Green",
+                                                                        legend_label=out[2])
+                                                            graph2.line(x, y[3], line_color="Magenta",
+                                                                        legend_label=out[3])
+                                                            graph2.line(x, y[4], line_color="Red",
+                                                                        legend_label=out[4])
+
+                                                            graph2.add_layout(graph2.legend[0], 'right')
+                                                            st.bokeh_chart(graph2, use_container_width=True)
+                                                            banner1 = Image.open("img/coun.png")
+                                                            st.image(banner1, use_column_width=True)
+                                                            st.header("Contacts of experts from various fields")
+
+                                                            for i in range(0, 5):
+                                                                st.subheader(subjects[int(l[i])])
+                                                                xl=(df['contacts'][int(l[i]) - 1]).split(",")
+                                                                for k in xl:
+                                                                    ml=list(k.split(","))
+                                                                    for kk in ml:
+                                                                        st.write(kk,sep="\n")
 
 
 
@@ -587,61 +620,72 @@ def main():
                                                                                 c = streams[n]
                                                                                 out.append(c)
 
-                                                                            explode = (0.0, 0.05, 0.1, 0.15, 0.3)
+                                                                            output_file("pie.html")
 
-                                                                            colors = (
-                                                                            "orange", "cyan", "brown", "indigo",
-                                                                            "beige")
+                                                                            graph = figure(title="Recommended fields",
+                                                                                           height=500, width=500)
+                                                                            radians = [
+                                                                                math.radians((percent / 100) * 360) for
+                                                                                percent in data]
 
-                                                                            wp = {'linewidth': 0.5,
-                                                                                  'edgecolor': "green"}
+                                                                            start_angle = [math.radians(0)]
+                                                                            prev = start_angle[0]
+                                                                            for i in radians[:-1]:
+                                                                                start_angle.append(i + prev)
+                                                                                prev = i + prev
 
-                                                                            def func(pct, allvalues):
-                                                                                absolute = int(
-                                                                                    pct / 100. * np.sum(allvalues))
-                                                                                return "{:.1f}%\n({:d} g)".format(pct,
-                                                                                                                  absolute)
+                                                                            end_angle = start_angle[1:] + [
+                                                                                math.radians(0)]
 
-                                                                            st.header("Recommended branches of study:")
-                                                                            fig, ax = plt.subplots(figsize=(10, 7))
-                                                                            wedges, texts, autotexts = ax.pie(data,
-                                                                                                              autopct=lambda
-                                                                                                                  pct: func(
-                                                                                                                  pct,
-                                                                                                                  data),
-                                                                                                              explode=explode,
-                                                                                                              labels=out,
-                                                                                                              shadow=True,
-                                                                                                              colors=colors,
-                                                                                                              wedgeprops=wp,
-                                                                                                              textprops=dict(
-                                                                                                                  color="magenta"))
-                                                                            ax.legend(wedges, out,
-                                                                                      title="streams",
-                                                                                      loc="center left",
-                                                                                      bbox_to_anchor=(1, 0, 0.5, 1))
+                                                                            x = 0
+                                                                            y = 0
 
-                                                                            ax.set_title("")
+                                                                            radius = 0.8
 
-                                                                            st.pyplot(fig)
+                                                                            color = Greens[len(out)]
+                                                                            graph.xgrid.visible = False
+                                                                            graph.ygrid.visible = False
+                                                                            graph.xaxis.visible = False
+                                                                            graph.yaxis.visible = False
+
+                                                                            for i in range(len(out)):
+                                                                                graph.wedge(x, y, radius,
+                                                                                            start_angle=start_angle[i],
+                                                                                            end_angle=end_angle[i],
+                                                                                            color=color[i],
+                                                                                            legend_label=out[
+                                                                                                             i] + "-" + str(
+                                                                                                round(data[i])) + "%")
+
+                                                                            graph.add_layout(graph.legend[0],
+                                                                                                'right')
+                                                                            st.bokeh_chart(graph,
+                                                                                            use_container_width=True)
+                                                                            labels = LabelSet(x='text_pos_x',
+                                                                                                y='text_pos_y',
+                                                                                                text='percentage',
+                                                                                                level='glyph',
+                                                                                                angle=0,
+                                                                                                render_mode='canvas')
+                                                                            graph.add_layout(labels)
 
                                                                             st.header(
-                                                                                'More information on the subjects')
+                                                                                'More information on the fields')
                                                                             # We'll be using a csv file for that
                                                                             for i in range(0, 5):
-                                                                                st.write(streams[int(l[i])])
+                                                                                st.subheader(streams[int(l[i])])
                                                                                 st.write(df['About'][int(l[i]) - 1])
 
                                                                             st.header('Average annual salary')
                                                                             # We'll be using a csv file for that
                                                                             for i in range(0, 5):
-                                                                                st.write(streams[int(l[i])])
-                                                                                st.write(
-                                                                                    df['avgsal'][int(l[i]) - 1])
+                                                                                st.subheader(streams[int(l[i])])
+                                                                                st.write("Rs. "+ str(
+                                                                                    df['avgsal'][int(l[i]) - 1]))
 
                                                                             st.header('Trends over the years')
                                                                             # We'll be using a csv file for that
-                                                                            fig, ax = plt.subplots()
+                                                                            
 
                                                                             def Convert(string):
                                                                                 li = list(string.split(","))
@@ -653,15 +697,39 @@ def main():
                                                                             for i in range(0, 5):
                                                                                 t = Convert(df['trends'][int(l[i]) - 1])
                                                                                 y.append(t)
-                                                                            plt.plot(x, (y[0]), 'pink')
-                                                                            plt.plot(x, y[1], 'g')
-                                                                            plt.plot(x, y[2], 'blue')
-                                                                            plt.plot(x, y[3], 'y')
-                                                                            plt.plot(x, y[4], 'r')
-                                                                            plt.xlabel('Years')
-                                                                            plt.ylabel('People')
-                                                                            plt.title('Trends over the years')
-                                                                            st.pyplot(fig)
+                                                                            output_file("line.html")
+                                                                            graph2 = figure(title="Trends")
+
+                                                                            graph2.line(x, y[0], line_color="Purple",
+                                                                                        legend_label=out[0])
+                                                                            graph2.line(x, y[1], line_color="Blue",
+                                                                                        legend_label=out[1])
+                                                                            graph2.line(x, y[2], line_color="Green",
+                                                                                        legend_label=out[2])
+                                                                            graph2.line(x, y[3], line_color="Magenta",
+                                                                                        legend_label=out[3])
+                                                                            graph2.line(x, y[4], line_color="Red",
+                                                                                        legend_label=out[4])
+
+                                                                            graph2.add_layout(graph2.legend[0], 'right')
+                                                                            st.bokeh_chart(graph2,
+                                                                                           use_container_width=True)
+
+                                                                            banner1 = Image.open("img/coun.png")
+                                                                            st.image(banner1, use_column_width=True)
+                                                                            st.header(
+                                                                                "Contacts of experts from various fields")
+
+
+                                                                            for i in range(0, 5):
+                                                                                st.subheader(streams[int(l[i])])
+                                                                                xl = (
+                                                                                df['contacts'][int(l[i]) - 1]).split(
+                                                                                    ",")
+                                                                                for k in xl:
+                                                                                    ml = list(k.split(","))
+                                                                                    for kk in ml:
+                                                                                        st.write(kk, sep="\n")
 
 
 
@@ -828,52 +896,61 @@ def main():
                                                                 c = professions[n]
                                                                 out.append(c)
 
-                                                            explode = (0.0, 0.05, 0.1, 0.15, 0.3)
+                                                            output_file("pie.html")
 
-                                                            colors = ("orange", "cyan", "brown", "indigo", "beige")
+                                                            graph = figure(title="Recommended professions", height=500,
+                                                                           width=500)
+                                                            radians = [math.radians((percent / 100) * 360) for percent
+                                                                       in data]
 
-                                                            wp = {'linewidth': 0.5, 'edgecolor': "green"}
+                                                            start_angle = [math.radians(0)]
+                                                            prev = start_angle[0]
+                                                            for i in radians[:-1]:
+                                                                start_angle.append(i + prev)
+                                                                prev = i + prev
 
-                                                            def func(pct, allvalues):
-                                                                absolute = int(pct / 100. * np.sum(allvalues))
-                                                                return "{:.1f}%\n({:d} g)".format(pct, absolute)
+                                                            end_angle = start_angle[1:] + [math.radians(0)]
 
-                                                            st.header("Recommended Professions:")
-                                                            fig, ax = plt.subplots(figsize=(10, 7))
-                                                            wedges, texts, autotexts = ax.pie(data,
-                                                                                              autopct=lambda pct: func(
-                                                                                                  pct, data),
-                                                                                              explode=explode,
-                                                                                              labels=out,
-                                                                                              shadow=True,
-                                                                                              colors=colors,
-                                                                                              wedgeprops=wp,
-                                                                                              textprops=dict(
-                                                                                                  color="magenta"))
-                                                            ax.legend(wedges, out,
-                                                                      title="Professions",
-                                                                      loc="center left",
-                                                                      bbox_to_anchor=(1, 0, 0.5, 1))
+                                                            x = 0
+                                                            y = 0
 
-                                                            ax.set_title("")
+                                                            radius = 0.8
 
-                                                            st.pyplot(fig)
+                                                            color = Greens[len(out)]
+                                                            graph.xgrid.visible = False
+                                                            graph.ygrid.visible = False
+                                                            graph.xaxis.visible = False
+                                                            graph.yaxis.visible = False
 
+                                                            for i in range(len(out)):
+                                                                graph.wedge(x, y, radius,
+                                                                            start_angle=start_angle[i],
+                                                                            end_angle=end_angle[i],
+                                                                            color=color[i],
+                                                                            legend_label=out[i] + "-" + str(
+                                                                                round(data[i])) + "%")
+
+                                                            graph.add_layout(graph.legend[0], 'right')
+                                                            st.bokeh_chart(graph, use_container_width=True)
+                                                            labels = LabelSet(x='text_pos_x', y='text_pos_y',
+                                                                                text='percentage', level='glyph',
+                                                                                angle=0, render_mode='canvas')
+                                                            graph.add_layout(labels)
                                                             st.header('More information on the professions')
                                                             # We'll be using a csv file for that
                                                             for i in range(0, 5):
-                                                                st.write(professions[int(l[i])])
+                                                                st.subheader(professions[int(l[i])])
                                                                 st.write(df['Information'][int(l[i]) - 1])
 
                                                             st.header('Monthly Income')
                                                             # We'll be using a csv file for that
                                                             for i in range(0, 5):
-                                                                st.write(professions[int(l[i])])
-                                                                st.write(df['Income'][int(l[i]) - 1])
+                                                                st.subheader(professions[int(l[i])])
+                                                                st.write("Rs. " + str(df['Income'][int(l[i]) - 1]))
 
                                                             st.header('Trends over the years')
                                                             # We'll be using a csv file for that
-                                                            fig, ax = plt.subplots()
+                                                        
 
                                                             def Convert(string):
                                                                 li = list(string.split(","))
@@ -885,15 +962,30 @@ def main():
                                                             for i in range(0, 5):
                                                                 t = Convert(df['trends'][int(l[i]) - 1])
                                                                 y.append(t)
-                                                            plt.plot(x, (y[0]), 'pink')
-                                                            plt.plot(x, y[1], 'g')
-                                                            plt.plot(x, y[2], 'blue')
-                                                            plt.plot(x, y[3], 'y')
-                                                            plt.plot(x, y[4], 'r')
-                                                            plt.xlabel('Years')
-                                                            plt.ylabel('People')
-                                                            plt.title('Trends over the years')
-                                                            st.pyplot(fig)
+                                                            output_file("line.html")
+                                                            graph2 = figure(title="Trends")
+
+                                                            graph2.line(x, y[0], line_color="Purple",
+                                                                        legend_label=out[0])
+                                                            graph2.line(x, y[1], line_color="Blue", legend_label=out[1])
+                                                            graph2.line(x, y[2], line_color="Green",
+                                                                        legend_label=out[2])
+                                                            graph2.line(x, y[3], line_color="Magenta",
+                                                                        legend_label=out[3])
+                                                            graph2.line(x, y[4], line_color="Red", legend_label=out[4])
+
+                                                            graph2.add_layout(graph2.legend[0], 'right')
+                                                            st.bokeh_chart(graph2, use_container_width=True)
+                                                            banner1 = Image.open("img/coun.png")
+                                                            st.image(banner1, use_column_width=True)
+                                                            st.header("Contacts of experts from various fields")
+                                                            for i in range(0, 5):
+                                                                st.subheader(professions[int(l[i])])
+                                                                xl=(df['contacts'][int(l[i]) - 1]).split(",")
+                                                                for k in xl:
+                                                                    ml=list(k.split(","))
+                                                                    for kk in ml:
+                                                                        st.write(kk,sep="\n")
 
 
 
